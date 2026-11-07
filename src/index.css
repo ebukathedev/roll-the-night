@@ -1,0 +1,67 @@
+:root {
+  --bg: #1a1030;
+  --panel: #26184a;
+  --text: #fff4e6;
+  --muted: #b9a9d9;
+  --accent: #ff3d81;
+  --accent-shadow: #b81b53;
+  --gold: #ffc83d;
+  --gold-shadow: #b38600;
+  --line: #3d2a6e;
+  --glow: #4a2a8a;
+
+  --font-display: 'Bungee', 'Arial Black', Impact, sans-serif;
+  --font-body: 'Figtree', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #fff1e6;
+    --panel: #ffffff;
+    --text: #2a1245;
+    --muted: #6c5a8a;
+    --accent: #e0245e;
+    --accent-shadow: #9e123d;
+    --gold: #e8a200;
+    --gold-shadow: #a17000;
+    --line: #ead9ff;
+    --glow: #ffd6e6;
+
+    color-scheme: light;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+*:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  background-color: var(--bg);
+  background-image: radial-gradient(ellipse 80% 50% at 50% 0%, var(--glow), var(--bg) 70%);
+  background-attachment: fixed;
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: max(20px, env(safe-area-inset-top, 20px)) max(16px, env(safe-area-inset-right, 16px)) max(32px, env(safe-area-inset-bottom, 32px)) max(16px, env(safe-area-inset-left, 16px));
+}
