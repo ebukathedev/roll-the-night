@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { sound } from '../utils/sound';
 import { fireConfetti } from '../utils/confetti';
+import { preloadImage } from '../utils/preload';
 import PositionIllustration from './PositionIllustration';
 import './FloatingRevealBall.css';
 
@@ -11,13 +12,17 @@ export default function FloatingRevealBall({ ballData, onComplete }) {
   const [phase, setPhase] = useState('floating');
   const [isFlipped, setIsFlipped] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const audioInitializedRef = useRef(false);
 
-  // Floating sound on spawn
+  // Preload image and play floating sound on spawn
   useEffect(() => {
     sound.init();
     sound.playFloatAscend();
-  }, []);
+    if (ballData?.image) {
+      preloadImage(ballData.image);
+    }
+  }, [ballData?.image]);
 
   // Handle tap to split and pop out card
   const handleBallTap = () => {
@@ -169,13 +174,18 @@ export default function FloatingRevealBall({ ballData, onComplete }) {
                 {/* Card Art Illustration Window */}
                 <div className="holo-art-window">
                   {!imgError && ballData.image ? (
-                    <img
-                      src={ballData.image}
-                      alt={ballData.name}
-                      className="holo-position-img"
-                      loading="eager"
-                      onError={() => setImgError(true)}
-                    />
+                    <>
+                      {!imgLoaded && <div className="art-loader-skeleton" aria-hidden="true" />}
+                      <img
+                        src={ballData.image}
+                        alt={ballData.name}
+                        className={`holo-position-img ${imgLoaded ? 'loaded' : ''}`}
+                        loading="eager"
+                        decoding="async"
+                        onLoad={() => setImgLoaded(true)}
+                        onError={() => setImgError(true)}
+                      />
+                    </>
                   ) : (
                     <PositionIllustration category={ballData.category} color={ballData.color} />
                   )}

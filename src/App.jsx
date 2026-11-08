@@ -15,6 +15,7 @@ import { SPICINESS_LEVELS } from './constants/spiciness';
 import { BALL_COLORS, darkenColor } from './utils/colors';
 import { sound } from './utils/sound';
 import { checkAgeVerified } from './utils/storage';
+import { preloadImage, preloadBatch } from './utils/preload';
 import './App.css';
 
 export default function App() {
@@ -48,6 +49,7 @@ export default function App() {
   const timer2Ref = useRef(null);
   const activeTotalRoundsRef = useRef(3);
   const drawnBallsRef = useRef([]);
+  const pendingBallRef = useRef(null);
 
   // Compute filtered positions pool based on selected Spiciness level
   const currentSpicinessDef =
@@ -59,6 +61,14 @@ export default function App() {
 
   const maxRounds = Math.min(10, Math.max(1, availablePool.length));
   const effectiveRounds = Math.min(rounds, maxRounds);
+
+  // Warm browser cache with an initial batch of position images from active pool
+  useEffect(() => {
+    if (availablePool.length > 0) {
+      const initialBatch = availablePool.slice(0, 8).map((p) => p.image);
+      preloadBatch(initialBatch);
+    }
+  }, [availablePool]);
 
   // Keep refs in sync with state
   useEffect(() => {
@@ -74,6 +84,7 @@ export default function App() {
     return () => {
       if (timer1Ref.current) clearTimeout(timer1Ref.current);
       if (timer2Ref.current) clearTimeout(timer2Ref.current);
+      sound.stopMixing();
     };
   }, []);
 
@@ -122,6 +133,7 @@ export default function App() {
   const handleStartOrDraw = () => {
     // If finished, action button is "Play again"
     if (gameState === 'finished') {
+      sound.stopMixing();
       setDrawnBalls([]);
       drawnBallsRef.current = [];
       setActiveFloatingBall(null);
@@ -145,6 +157,33 @@ export default function App() {
       drawnBallsRef.current = [];
     }
 
+    // Pick the position immediately at t=0 so the card illustration preloads
+    // during the 4.7s mixing and announcing animation sequence.
+    const prevDrawn = drawnBallsRef.current;
+    const drawnIds = new Set(prevDrawn.map((b) => b.positionId));
+    const unpicked = availablePool.filter((p) => !drawnIds.has(p.id));
+    const chosen =
+      unpicked.length > 0
+        ? unpicked[Math.floor(Math.random() * unpicked.length)]
+        : availablePool[Math.floor(Math.random() * availablePool.length)];
+
+    const color = BALL_COLORS[prevDrawn.length % BALL_COLORS.length];
+    const newBall = {
+      ...chosen,
+      id: `${Date.now()}-${chosen.id}`,
+      positionId: chosen.id,
+      num: chosen.id,
+      name: chosen.name,
+      color,
+      darkColor: darkenColor(color, 0.55),
+    };
+    pendingBallRef.current = newBall;
+
+    // Trigger immediate background fetch & browser decode
+    if (chosen?.image) {
+      preloadImage(chosen.image);
+    }
+
     // Step 1: Lock inputs and start mixing
     setGameState('mixing');
     setStatusText('Mixing the balls…');
@@ -158,36 +197,18 @@ export default function App() {
       setStatusText('And the number is…');
     }, 3200);
 
-    // Step 3: At 4.7s -> pick position from availablePool and trigger floating reveal ball
+    // Step 3: At 4.7s -> trigger floating reveal ball
     timer2Ref.current = setTimeout(() => {
-      const prevDrawn = drawnBallsRef.current;
-      const drawnIds = new Set(prevDrawn.map((b) => b.positionId));
-
-      // Pick a random position matching the spiciness level not yet drawn in this session
-      const unpicked = availablePool.filter((p) => !drawnIds.has(p.id));
-      const chosen =
-        unpicked.length > 0
-          ? unpicked[Math.floor(Math.random() * unpicked.length)]
-          : availablePool[Math.floor(Math.random() * availablePool.length)];
-
-      const color = BALL_COLORS[prevDrawn.length % BALL_COLORS.length];
-      const newBall = {
-        ...chosen,
-        id: `${Date.now()}-${chosen.id}`,
-        positionId: chosen.id,
-        num: chosen.id,
-        name: chosen.name,
-        color,
-        darkColor: darkenColor(color, 0.55),
-      };
+      const ballToReveal = pendingBallRef.current;
+      if (!ballToReveal) return;
 
       // Physics: replace one random ball inside the machine
       machineRef.current?.removeAndReplaceBall();
 
       // Launch floating center reveal
       setGameState('revealing');
-      setStatusText(`Ball #${chosen.id} emerging! Tap to open!`);
-      setActiveFloatingBall(newBall);
+      setStatusText(`Ball #${ballToReveal.num} emerging! Tap to open!`);
+      setActiveFloatingBall(ballToReveal);
     }, 4700);
   };
 

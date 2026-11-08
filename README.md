@@ -39,6 +39,27 @@ When a ball is drawn, the app picks a random position from the built-in database
 
 ## Changelog
 
+### 2026-11-08 – v1.7 – Image preloading, background caching & smooth card render
+- **Instant Image Delivery During Ball Agitation** (`src/App.jsx`, `src/utils/preload.js`):
+  - Solved live network latency by shifting position selection from $t = 4.7\text{s}$ (post-animation) to $t = 0$ upon clicking "Start the machine" / "Draw ball".
+  - Utilizes the 4.7-second shuffle and announcement window to download and cache the illustration PNG in the browser's HTTP/memory cache before the ball split and card flip happen.
+  - Added in-memory singleton preloading cache in `src/utils/preload.js` with `preloadImage` and `preloadBatch` helpers.
+- **Initial Pool Warming** (`src/App.jsx`):
+  - Automatically warms the browser cache with an initial batch of position illustrations matching the currently active spiciness mode upon component mount or mode switch.
+- **Progressive Image Loading & Shimmer Skeleton** (`src/components/FloatingRevealBall.jsx`, `src/components/FloatingRevealBall.css`, `src/components/PositionCard.jsx`):
+  - Added asynchronous image decoding (`decoding="async"`) to prevent main-thread UI jank during card flip animation.
+  - Added an animated shimmer skeleton placeholder (`.art-loader-skeleton`) with smooth opacity fade-in transition (`.holo-position-img.loaded`) when images finalize rendering.
+- Touched files: `src/utils/preload.js` (new), `src/App.jsx`, `src/components/FloatingRevealBall.jsx`, `src/components/FloatingRevealBall.css`, `src/components/PositionCard.jsx`, `README.md`.
+
+### 2026-11-08 – v1.6 – Stereo ball rattling & vortex air sound effects
+- **Realistic Lottery Ball Rattling Audio** (`src/utils/sound.js`):
+  - Upgraded procedural audio synthesis for the 3.2-second shuffle sequence with a dual-layer audio buffer:
+    - **Air Vortex**: Low-pass and band-pass filtered air turbulence with gentle 3.5Hz vortex modulation.
+    - **Ball Collision Clatter**: ~92 synthesized micro-impacts simulating hollow plastic and acrylic ball-to-ball and ball-to-glass collisions across stereo channels.
+    - Accurately tracks agitation physics: collisions ramp up with air agitation, peak during maximum turbulence (0.7s–2.65s), and gradually slow down as the air eases off and balls settle.
+  - Added clean audio lifecycle management with `stopMixing()` on unmount and game resets.
+- Touched files: `src/utils/sound.js`, `src/App.jsx`, `README.md`.
+
 ### 2026-11-08 – v1.5 – One-time Age Gate & Spiciness levels
 - **One-Time Age Gate** (`src/components/AgeGate.jsx`, `src/components/AgeGate.css`, `src/utils/storage.js`):
   - Moved the 18+ confirmation from an inline settings checkbox to an atmospheric full-screen entrance modal shown on first visit.

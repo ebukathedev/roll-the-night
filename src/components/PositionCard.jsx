@@ -86,6 +86,7 @@ export default function PositionCard({ position, ballColor, onClose }) {
                 alt={position.name}
                 className="card-position-img"
                 loading="eager"
+                decoding="async"
                 onError={() => setErroredId(position.id)}
               />
             </div>

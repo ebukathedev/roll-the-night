@@ -1,13 +1,14 @@
 /**
  * Roll the Night — Web Audio API Synthesizer
- * Pure zero-dependency sound effects for arcade game-show excitement.
- * Autoplay compliant: context initialized on first user interaction.
+ * Pure zero-dependency procedural audio for authentic lottery arcade excitement.
+ * Features realistic air-flow vortex and stereo ball-rattling collisions during shuffle.
  */
 
 class SoundEngine {
   constructor() {
     this.ctx = null;
     this.isMuted = false;
+    this.mixingSource = null;
   }
 
   init() {
@@ -24,44 +25,148 @@ class SoundEngine {
 
   toggleMute() {
     this.isMuted = !this.isMuted;
+    if (this.isMuted) {
+      this.stopMixing();
+    }
     return this.isMuted;
   }
 
-  // 1. Mixing Whoosh Drone
+  stopMixing() {
+    if (this.mixingSource) {
+      try {
+        this.mixingSource.stop();
+      } catch {
+        // already stopped
+      }
+      this.mixingSource = null;
+    }
+  }
+
+  // 1. Air Vortex + Ball Rattling Shuffling Sound
   playMixing() {
     if (this.isMuted) return;
     this.init();
     if (!this.ctx) return;
 
+    this.stopMixing();
+
     try {
-      const now = this.ctx.currentTime;
-      // Filtered noise buffer for air blowing
-      const bufferSize = this.ctx.sampleRate * 1.5;
-      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
+      const sampleRate = this.ctx.sampleRate;
+      const duration = 3.3; // 3.2s mixing phase + 0.1s tail
+      const totalSamples = Math.floor(sampleRate * duration);
+
+      const audioBuffer = this.ctx.createBuffer(2, totalSamples, sampleRate);
+      const left = audioBuffer.getChannelData(0);
+      const right = audioBuffer.getChannelData(1);
+
+      // --- Layer A: Air Stream Vortex ---
+      let lastNoiseL = 0;
+      let lastNoiseR = 0;
+
+      for (let i = 0; i < totalSamples; i++) {
+        const t = i / sampleRate;
+
+        // Air velocity envelope: swells up to 0.7s, peaks, softens after 2.7s
+        let airEnv = 0;
+        if (t < 0.7) {
+          airEnv = (t / 0.7) * 0.14;
+        } else if (t < 2.7) {
+          // Subtle rhythmic vortex breathing (3.5Hz)
+          airEnv = 0.14 + 0.03 * Math.sin(t * 3.5 * Math.PI * 2);
+        } else {
+          airEnv = Math.max(0, 0.14 * (1 - (t - 2.7) / 0.6));
+        }
+
+        const whiteL = Math.random() * 2 - 1;
+        const whiteR = Math.random() * 2 - 1;
+
+        // Two-stage smoothed pink/bandpass noise simulation
+        lastNoiseL = lastNoiseL * 0.82 + whiteL * 0.18;
+        lastNoiseR = lastNoiseR * 0.82 + whiteR * 0.18;
+
+        left[i] += lastNoiseL * airEnv * 0.75;
+        right[i] += lastNoiseR * airEnv * 0.75;
       }
 
-      const noise = this.ctx.createBufferSource();
-      noise.buffer = buffer;
+      // --- Layer B: Plastic & Acrylic Ball Collisions (Rattling Clatter) ---
+      // Generate ~90 micro-clacks distributed across the 3.2s agitation
+      const numClicks = 92;
 
-      const filter = this.ctx.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.setValueAtTime(320, now);
-      filter.frequency.linearRampToValueAtTime(540, now + 1.2);
+      for (let c = 0; c < numClicks; c++) {
+        // Density curve: sparse at start, very dense during peak air (0.7s - 2.6s), slows at end
+        // Map c through a custom timing curve
+        const progress = c / numClicks;
+        let t;
+        if (progress < 0.2) {
+          t = 0.1 + progress * 3.0; // 0.1s to 0.7s
+        } else if (progress < 0.85) {
+          t = 0.7 + ((progress - 0.2) / 0.65) * 1.95; // 0.7s to 2.65s (dense peak)
+        } else {
+          t = 2.65 + ((progress - 0.85) / 0.15) * 0.55; // 2.65s to 3.2s (settling down)
+        }
 
-      const gain = this.ctx.createGain();
-      gain.gain.setValueAtTime(0.01, now);
-      gain.gain.linearRampToValueAtTime(0.12, now + 0.3);
-      gain.gain.linearRampToValueAtTime(0.01, now + 1.4);
+        // Add slight timing jitter
+        t += (Math.random() - 0.5) * 0.04;
+        if (t < 0.05 || t > 3.25) continue;
 
-      noise.connect(filter);
-      filter.connect(gain);
-      gain.connect(this.ctx.destination);
+        const startSample = Math.floor(t * sampleRate);
 
-      noise.start(now);
-      noise.stop(now + 1.5);
+        // Acoustic properties of hollow ping-pong / lottery balls
+        // Primary resonance: 900Hz - 2200Hz
+        const freq1 = 950 + Math.random() * 1150;
+        const freq2 = freq1 * (1.6 + Math.random() * 0.4); // Overharmonic shell mode
+        const decay = 0.012 + Math.random() * 0.016; // 12ms - 28ms fast decay
+        const pan = Math.random(); // 0 (left) to 1 (right) stereo position
+        const amp = 0.18 + Math.random() * 0.32; // Random strike force
+
+        const clickSamples = Math.floor(decay * 4 * sampleRate);
+
+        for (let j = 0; j < clickSamples && (startSample + j) < totalSamples; j++) {
+          const dt = j / sampleRate;
+          const clickEnv = Math.exp(-dt / decay);
+
+          // Hard transient contact click
+          const snap = dt < 0.0018 ? (Math.random() * 2 - 1) * 0.35 : 0;
+
+          // Hollow ball shell ringing
+          const shellTone = Math.sin(2 * Math.PI * freq1 * dt) * 0.75 + Math.sin(2 * Math.PI * freq2 * dt) * 0.25;
+          const sampleVal = (shellTone * 0.85 + snap) * clickEnv * amp;
+
+          left[startSample + j] += sampleVal * (1 - pan);
+          right[startSample + j] += sampleVal * pan;
+        }
+      }
+
+      // Headroom check to avoid clipping
+      let peak = 0;
+      for (let i = 0; i < totalSamples; i++) {
+        peak = Math.max(peak, Math.abs(left[i]), Math.abs(right[i]));
+      }
+      if (peak > 0.95) {
+        const normFactor = 0.95 / peak;
+        for (let i = 0; i < totalSamples; i++) {
+          left[i] *= normFactor;
+          right[i] *= normFactor;
+        }
+      }
+
+      const source = this.ctx.createBufferSource();
+      source.buffer = audioBuffer;
+
+      const masterGain = this.ctx.createGain();
+      masterGain.gain.setValueAtTime(0.85, this.ctx.currentTime);
+
+      source.connect(masterGain);
+      masterGain.connect(this.ctx.destination);
+
+      source.start();
+      this.mixingSource = source;
+
+      source.onended = () => {
+        if (this.mixingSource === source) {
+          this.mixingSource = null;
+        }
+      };
     } catch {
       // Audio fallback silent
     }
@@ -259,4 +364,3 @@ class SoundEngine {
 }
 
 export const sound = new SoundEngine();
-
