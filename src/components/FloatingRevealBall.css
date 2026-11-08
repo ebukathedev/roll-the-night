@@ -1,0 +1,691 @@
+/* ── Floating Reveal Ball Overlay ──────────────────────── */
+
+.floating-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.floating-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 5, 25, 0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: opacity 0.5s ease;
+  z-index: 1;
+}
+
+/* ── The Center Stage ───────────────────────────────────── */
+
+.reveal-stage {
+  position: relative;
+  z-index: 2;
+  width: 320px;
+  height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1200px;
+}
+
+/* ── Floating & Glowing Ball ────────────────────────────── */
+
+@keyframes floatBob {
+  0%, 100% {
+    transform: translateY(-8px) scale(1);
+  }
+  50% {
+    transform: translateY(8px) scale(1.02);
+  }
+}
+
+@keyframes auraGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 25px var(--ball-color)) drop-shadow(0 0 60px rgba(255, 200, 61, 0.35));
+  }
+  50% {
+    filter: drop-shadow(0 0 40px var(--ball-color)) drop-shadow(0 0 85px rgba(255, 61, 129, 0.5));
+  }
+}
+
+.reveal-stage.floating {
+  animation: floatBob 3s ease-in-out infinite;
+}
+
+/* ── Ball Halves (Pokeball-style Split) ──────────────────── */
+
+.ball-half {
+  position: absolute;
+  width: 140px;
+  height: 70px;
+  left: 50%;
+  margin-left: -70px;
+  cursor: pointer;
+  transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+  z-index: 10;
+}
+
+.ball-half-top {
+  top: calc(50% - 70px);
+  border-radius: 70px 70px 0 0;
+  background:
+    radial-gradient(circle at 45% 30%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.4) 16%, transparent 32%),
+    radial-gradient(circle at 50% 100%, var(--ball-color) 0%, var(--ball-dark) 100%);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.4);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35);
+  transform-origin: center bottom;
+}
+
+.ball-half-bottom {
+  top: 50%;
+  border-radius: 0 0 70px 70px;
+  background:
+    radial-gradient(circle at 50% 0%, var(--ball-color) 0%, var(--ball-dark) 100%);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top: 2px solid rgba(0, 0, 0, 0.4);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  transform-origin: center top;
+}
+
+/* Split Open State */
+.reveal-stage.opening .ball-half-top,
+.reveal-stage.card .ball-half-top {
+  transform: translateY(-135px) scale(0.72) rotateX(20deg);
+  opacity: 0.85;
+}
+
+.reveal-stage.opening .ball-half-bottom,
+.reveal-stage.card .ball-half-bottom {
+  transform: translateY(135px) scale(0.72) rotateX(-20deg);
+  opacity: 0.85;
+}
+
+/* Packing Up State (Snap Back & Float Down) */
+.reveal-stage.packing .ball-half-top {
+  transform: translateY(0) scale(1) rotateX(0deg);
+  transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.reveal-stage.packing .ball-half-bottom {
+  transform: translateY(0) scale(1) rotateX(0deg);
+  transition: transform 0.38s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+.reveal-stage.packing {
+  animation: floatDownToTray 0.85s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes floatDownToTray {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(0) scale(0.9);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(280px) scale(0.45);
+    opacity: 0;
+  }
+}
+
+/* ── Center Latch Button & Number ───────────────────────── */
+
+.ball-center-latch {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 4px solid #1a1030;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+  box-shadow: 0 0 16px rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.latch-ring {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--ball-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.latch-number {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+.reveal-stage.opening .ball-center-latch,
+.reveal-stage.card .ball-center-latch {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.4);
+  pointer-events: none;
+}
+
+/* ── Energy Beam / Core ─────────────────────────────────── */
+
+.energy-core {
+  position: absolute;
+  width: 160px;
+  height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 1) 0%, rgba(255, 200, 61, 0.8) 45%, rgba(255, 61, 129, 0) 75%);
+  filter: blur(6px);
+  opacity: 0;
+  transform: scale(0.3);
+  transition: opacity 0.4s ease, transform 0.5s ease;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.reveal-stage.opening .energy-core,
+.reveal-stage.card .energy-core {
+  opacity: 1;
+  transform: scale(2.2);
+}
+
+/* ── Tap to Open Pill ───────────────────────────────────── */
+
+.tap-prompt-pill {
+  position: absolute;
+  bottom: 80px;
+  padding: 8px 18px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  animation: pulsePrompt 1.6s ease-in-out infinite;
+  z-index: 20;
+}
+
+@keyframes pulsePrompt {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 4px 18px rgba(255, 200, 61, 0.25);
+  }
+  50% {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 26px rgba(255, 200, 61, 0.5);
+  }
+}
+
+/* ── 3D Card Container (Pokemon Style) ──────────────────── */
+
+.card-3d-wrapper {
+  position: absolute;
+  width: 290px;
+  height: 410px;
+  z-index: 25;
+  perspective: 1200px;
+  opacity: 0;
+  transform: scale(0.2) translateY(30px);
+  transition: opacity 0.45s ease, transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+
+.reveal-stage.card .card-3d-wrapper {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+}
+
+.reveal-stage.packing .card-3d-wrapper {
+  opacity: 0;
+  transform: scale(0.2) translateY(20px);
+  transition: opacity 0.35s ease, transform 0.4s ease;
+}
+
+.card-3d-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.85s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.card-3d-wrapper.flipped .card-3d-inner {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(255, 200, 61, 0.5);
+}
+
+/* ── CARD BACK (Pokemon TCG Style Pattern) ──────────────── */
+
+.card-back {
+  background: linear-gradient(135deg, #1f113a 0%, #351a66 50%, #15092a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+}
+
+.card-back-frame {
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  border: 3px solid #ffc83d;
+  background: radial-gradient(circle at center, #421e7d 0%, #1a0c33 80%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+.card-back-orb {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffc83d 0%, #ff3d81 60%, #4a154b 100%);
+  border: 4px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 24px rgba(255, 200, 61, 0.7);
+}
+
+.orb-num {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.card-back-title {
+  margin-top: 18px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 2px;
+  color: #ffc83d;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* ── CARD FRONT (Pokemon-style Holographic Rare) ────────── */
+
+.card-front {
+  transform: rotateY(180deg);
+  background: #1e1338;
+}
+
+.holo-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #180d2e;
+  border-radius: 18px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 4px solid #ffc83d;
+  overflow: hidden;
+}
+
+/* Holographic Shimmer Sweep */
+.holo-foil-shimmer {
+  position: absolute;
+  inset: -60%;
+  background: linear-gradient(
+    115deg,
+    transparent 20%,
+    rgba(255, 61, 129, 0.25) 35%,
+    rgba(255, 200, 61, 0.35) 45%,
+    rgba(46, 196, 182, 0.3) 55%,
+    rgba(255, 255, 255, 0.5) 60%,
+    transparent 75%
+  );
+  animation: foilShimmerSweep 4.5s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 10;
+  mix-blend-mode: screen;
+}
+
+@keyframes foilShimmerSweep {
+  0% {
+    transform: translateX(-40%) translateY(-30%) rotate(0deg);
+  }
+  50% {
+    transform: translateX(35%) translateY(30%) rotate(15deg);
+  }
+  100% {
+    transform: translateX(-40%) translateY(-30%) rotate(0deg);
+  }
+}
+
+/* Header */
+.holo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #ffc83d;
+  padding-bottom: 5px;
+  position: relative;
+  z-index: 2;
+}
+
+.holo-title-group {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.holo-card-type {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--gold);
+}
+
+.holo-card-name {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.15;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  max-width: 190px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.holo-hp-badge {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  background: rgba(255, 200, 61, 0.2);
+  border: 1px solid #ffc83d;
+  border-radius: 8px;
+  padding: 2px 6px;
+}
+
+.hp-label {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+.hp-value {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: #ffffff;
+}
+
+/* Art Window */
+.holo-art-window {
+  width: 100%;
+  height: 150px;
+  background: #ffffff;
+  border-radius: 10px;
+  border: 2px solid #ffc83d;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
+
+.holo-position-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.art-glare {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, transparent 45%);
+  pointer-events: none;
+}
+
+/* Sub-bar */
+.holo-sub-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 4px;
+  position: relative;
+  z-index: 2;
+}
+
+.holo-level-pill {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.holo-safe {
+  background: rgba(46, 196, 182, 0.2);
+  border: 1px solid #2ec4b6;
+  color: #2ec4b6;
+}
+
+.holo-careful {
+  background: rgba(255, 200, 61, 0.2);
+  border: 1px solid #ffc83d;
+  color: #ffc83d;
+}
+
+.holo-dangerous {
+  background: rgba(255, 61, 129, 0.2);
+  border: 1px solid #ff3d81;
+  color: #ff3d81;
+}
+
+.holo-difficulty-stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.holo-star {
+  font-size: 0.75rem;
+  color: var(--line);
+}
+
+.holo-star.active {
+  color: var(--gold);
+}
+
+.diff-text {
+  font-size: 0.65rem;
+  color: var(--muted);
+  margin-left: 4px;
+}
+
+/* Ability / Description Box */
+.holo-ability-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-align: left;
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.ability-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 2px;
+}
+
+.energy-icon {
+  font-size: 0.75rem;
+}
+
+.holo-description {
+  font-size: 0.8rem;
+  color: var(--text);
+  line-height: 1.35;
+  margin: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* Tags */
+.holo-tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  position: relative;
+  z-index: 2;
+}
+
+.holo-tag-badge {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 1px 5px;
+}
+
+/* Footer */
+.holo-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 4px;
+  position: relative;
+  z-index: 2;
+}
+
+.rarity-symbol {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.5px;
+}
+
+.holo-source-link {
+  font-size: 0.68rem;
+  color: var(--gold);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.holo-source-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Pack Up Button ─────────────────────────────────────── */
+
+.pack-up-action-btn {
+  position: absolute;
+  bottom: -24px;
+  padding: 12px 28px;
+  border-radius: 20px;
+  border: none;
+  background: var(--accent);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 0 var(--accent-shadow), 0 8px 24px rgba(255, 61, 129, 0.4);
+  cursor: pointer;
+  z-index: 30;
+  animation: bounceBtn 1.5s ease-in-out infinite;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.15s ease;
+}
+
+@keyframes bounceBtn {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.pack-up-action-btn:hover {
+  filter: brightness(1.1);
+}
+
+.pack-up-action-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--accent-shadow);
+}
+
+/* ── Reduced Motion Support ─────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-stage.floating {
+    animation: none !important;
+  }
+  .tap-prompt-pill {
+    animation: none !important;
+  }
+  .holo-foil-shimmer {
+    animation: none !important;
+  }
+  .pack-up-action-btn {
+    animation: none !important;
+  }
+  .card-3d-inner {
+    transition-duration: 0.01s !important;
+  }
+  .ball-half {
+    transition-duration: 0.01s !important;
+  }
+}
+

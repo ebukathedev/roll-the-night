@@ -1,0 +1,312 @@
+/* ── Position Reveal Dialog ─────────────────────────────── */
+
+.position-dialog {
+  border: none;
+  background: transparent;
+  padding: 0;
+  max-width: min(440px, 92vw);
+  width: 100%;
+  overflow: visible;
+}
+
+.position-dialog::backdrop {
+  background: rgba(10, 5, 25, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.position-dialog[open] {
+  animation: cardReveal 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes cardReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(36px) scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .position-dialog[open] {
+    animation: none !important;
+  }
+}
+
+/* ── Card ───────────────────────────────────────────────── */
+
+.position-card {
+  background-color: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  padding: 0 0 24px;
+  text-align: center;
+  position: relative;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.5),
+    0 0 0 1px var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* ── Close Button ───────────────────────────────────────── */
+
+.card-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  z-index: 2;
+}
+
+.card-close-btn:hover {
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+/* ── Illustration / Image Area ──────────────────────────── */
+
+.card-illustration-area {
+  width: 100%;
+  padding: 24px 20px 12px;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 45%, var(--illus-glow, rgba(255, 61, 129, 0.15)), transparent 70%),
+    linear-gradient(180deg, var(--line) 0%, var(--panel) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-img-frame {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 250px;
+  width: 100%;
+  max-height: 190px;
+  overflow: hidden;
+}
+
+.card-position-img {
+  width: 100%;
+  height: auto;
+  max-height: 174px;
+  object-fit: contain;
+  display: block;
+  border-radius: 10px;
+}
+
+.position-illustration {
+  width: 180px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+}
+
+/* ── Ball Badge ─────────────────────────────────────────── */
+
+.card-ball-badge {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  margin-top: -4px;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.35) 14%, rgba(255, 255, 255, 0) 30%),
+    radial-gradient(circle at 48% 48%, var(--badge-color) 0%, color-mix(in srgb, var(--badge-color) 45%, black) 100%);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  flex-shrink: 0;
+}
+
+/* ── Title ──────────────────────────────────────────────── */
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 4.8vw, 1.7rem);
+  color: var(--text);
+  margin: 0;
+  line-height: 1.18;
+  letter-spacing: 0.3px;
+  padding: 0 24px;
+}
+
+/* ── Meta Badges ────────────────────────────────────────── */
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 0 20px;
+}
+
+.card-category {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1.5px solid;
+}
+
+.card-level {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.level-safe {
+  background: rgba(46, 196, 182, 0.16);
+  border: 1.5px solid #2ec4b6;
+  color: #2ec4b6;
+}
+
+.level-careful {
+  background: rgba(255, 200, 61, 0.16);
+  border: 1.5px solid #ffc83d;
+  color: #ffc83d;
+}
+
+.level-dangerous {
+  background: rgba(255, 61, 129, 0.16);
+  border: 1.5px solid #ff3d81;
+  color: #ff3d81;
+}
+
+.card-difficulty {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.diff-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background-color: var(--line);
+  transition: background-color 0.2s ease;
+}
+
+.diff-dot.filled {
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.18);
+}
+
+.diff-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-left: 2px;
+}
+
+/* ── Description ────────────────────────────────────────── */
+
+.card-description {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  margin: 0;
+  max-width: 38ch;
+  padding: 0 24px;
+}
+
+/* ── Tags ───────────────────────────────────────────────── */
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 22px;
+}
+
+.card-tag {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 2px 7px;
+  letter-spacing: 0.2px;
+}
+
+/* ── External Link ──────────────────────────────────────── */
+
+.card-external-link {
+  color: var(--gold);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+  margin-top: 2px;
+}
+
+.card-external-link:hover {
+  text-decoration: underline;
+  opacity: 0.85;
+}
+
+/* ── Got it Button ──────────────────────────────────────── */
+
+.card-got-it-btn {
+  width: calc(100% - 48px);
+  margin: 4px 24px 0;
+  padding: 13px 20px;
+  border-radius: 12px;
+  border: none;
+  background-color: var(--accent);
+  color: #ffffff;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 0 var(--accent-shadow);
+  transform: translateY(0);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.15s ease;
+  user-select: none;
+}
+
+.card-got-it-btn:hover {
+  filter: brightness(1.06);
+}
+
+.card-got-it-btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--accent-shadow);
+}

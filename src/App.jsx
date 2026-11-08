@@ -1,44 +1,64 @@
-import { useState, useRef, useEffect } from 'react';
-import BallMachine from './BallMachine';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import {
+  Header,
+  MachineStage,
+  StatusLine,
+  SettingsPanel,
+  BallTray,
+  HintLine,
+  PositionCard,
+  FloatingRevealBall,
+  AgeGate,
+} from './components';
+import positions from './data/positions';
+import { SPICINESS_LEVELS } from './constants/spiciness';
+import { BALL_COLORS, darkenColor } from './utils/colors';
+import { sound } from './utils/sound';
+import { checkAgeVerified } from './utils/storage';
 import './App.css';
 
-const BALL_COLORS = ['#ff3d81', '#ffc83d', '#2ec4b6', '#7b5cff', '#ff7a3d', '#3da5ff'];
-
-function darkenColor(hex, factor = 0.55) {
-  const num = parseInt(hex.replace('#', ''), 16);
-  const r = Math.max(0, Math.floor(((num >> 16) & 255) * factor));
-  const g = Math.max(0, Math.floor(((num >> 8) & 255) * factor));
-  const b = Math.max(0, Math.floor((num & 255) * factor));
-  return `rgb(${r}, ${g}, ${b})`;
-}
-
-function clampHighest(val) {
-  let num = parseInt(val, 10);
-  if (isNaN(num) || num < 10) num = 10;
-  if (num > 9999) num = 9999;
-  return num;
-}
-
 export default function App() {
-  const [rounds, setRounds] = useState(3);
-  const [highestNumber, setHighestNumber] = useState(294);
-  const [highestInput, setHighestInput] = useState('294');
-  const [isAgeConfirmed, setIsAgeConfirmed] = useState(false);
+  // One-time Age Gate status (persisted in localStorage)
+  const [isAgeVerified, setIsAgeVerified] = useState(checkAgeVerified);
 
-  // Game state: 'idle' | 'mixing' | 'announcing' | 'drawn' | 'finished'
+  // Spiciness level mode
+  const [selectedSpiciness, setSelectedSpiciness] = useState('spicy');
+
+  // Rounds stepper
+  const [rounds, setRounds] = useState(3);
+  const [isMuted, setIsMuted] = useState(false);
+
+  // Game state: 'idle' | 'mixing' | 'announcing' | 'revealing' | 'drawn' | 'finished'
   const [gameState, setGameState] = useState('idle');
   const [activeTotalRounds, setActiveTotalRounds] = useState(3);
   const [drawnBalls, setDrawnBalls] = useState([]);
   const [airTarget, setAirTarget] = useState(0);
-  const [statusText, setStatusText] = useState('Set your rounds, then start the machine.');
+  const [statusText, setStatusText] = useState('Set your rounds and spiciness, then start the machine.');
   const [btnText, setBtnText] = useState('Start the machine');
+
+  // Currently floating / revealing ball
+  const [activeFloatingBall, setActiveFloatingBall] = useState(null);
+
+  // Position card dialog state (for inspecting balls in tray)
+  const [revealedPosition, setRevealedPosition] = useState(null);
+  const [revealedBallColor, setRevealedBallColor] = useState(null);
 
   const machineRef = useRef(null);
   const timer1Ref = useRef(null);
   const timer2Ref = useRef(null);
   const activeTotalRoundsRef = useRef(3);
-  const highestNumberRef = useRef(294);
   const drawnBallsRef = useRef([]);
+
+  // Compute filtered positions pool based on selected Spiciness level
+  const currentSpicinessDef =
+    SPICINESS_LEVELS.find((s) => s.id === selectedSpiciness) || SPICINESS_LEVELS[0];
+
+  const availablePool = useMemo(() => {
+    return positions.filter(currentSpicinessDef.filter);
+  }, [currentSpicinessDef]);
+
+  const maxRounds = Math.min(10, Math.max(1, availablePool.length));
+  const effectiveRounds = Math.min(rounds, maxRounds);
 
   // Keep refs in sync with state
   useEffect(() => {
@@ -49,11 +69,7 @@ export default function App() {
     activeTotalRoundsRef.current = activeTotalRounds;
   }, [activeTotalRounds]);
 
-  useEffect(() => {
-    highestNumberRef.current = highestNumber;
-  }, [highestNumber]);
-
-  // Clear timers on unmount
+  // Clean up timers on unmount
   useEffect(() => {
     return () => {
       if (timer1Ref.current) clearTimeout(timer1Ref.current);
@@ -61,61 +77,70 @@ export default function App() {
     };
   }, []);
 
-  const isDrawing = gameState === 'mixing' || gameState === 'announcing';
+  const isDrawing = gameState === 'mixing' || gameState === 'announcing' || gameState === 'revealing';
   const isInputsLocked = gameState !== 'idle';
 
+  const handleToggleSound = () => {
+    const muted = sound.toggleMute();
+    setIsMuted(muted);
+  };
+
   const handleDecreaseRounds = () => {
-    if (isInputsLocked || rounds <= 1) return;
-    setRounds((prev) => prev - 1);
+    if (isInputsLocked || effectiveRounds <= 1) return;
+    setRounds(effectiveRounds - 1);
   };
 
   const handleIncreaseRounds = () => {
-    if (isInputsLocked || rounds >= 10 || rounds >= highestNumber) return;
-    setRounds((prev) => prev + 1);
+    if (isInputsLocked || effectiveRounds >= maxRounds) return;
+    setRounds(effectiveRounds + 1);
   };
 
-  const handleHighestInputChange = (e) => {
-    setHighestInput(e.target.value);
-  };
-
-  const handleHighestInputBlur = () => {
-    const clamped = clampHighest(highestInput);
-    setHighestNumber(clamped);
-    highestNumberRef.current = clamped;
-    setHighestInput(String(clamped));
-    if (rounds > clamped) {
-      setRounds(clamped);
+  const handleSelectSpiciness = (spicinessId) => {
+    if (isInputsLocked) return;
+    setSelectedSpiciness(spicinessId);
+    const newDef = SPICINESS_LEVELS.find((s) => s.id === spicinessId) || SPICINESS_LEVELS[0];
+    const newPool = positions.filter(newDef.filter);
+    const newMax = Math.min(10, Math.max(1, newPool.length));
+    if (rounds > newMax) {
+      setRounds(newMax);
     }
   };
+
+  const handleBallTap = (ball) => {
+    const position = positions.find((p) => p.id === ball.positionId);
+    if (position) {
+      setRevealedPosition(position);
+      setRevealedBallColor(ball.color);
+    }
+  };
+
+  const handleCloseCard = useCallback(() => {
+    setRevealedPosition(null);
+    setRevealedBallColor(null);
+  }, []);
 
   const handleStartOrDraw = () => {
     // If finished, action button is "Play again"
     if (gameState === 'finished') {
       setDrawnBalls([]);
       drawnBallsRef.current = [];
+      setActiveFloatingBall(null);
       setGameState('idle');
-      setStatusText('Set your rounds, then start the machine.');
+      setStatusText('Set your rounds and spiciness, then start the machine.');
       setBtnText('Start the machine');
       setAirTarget(0);
       return;
     }
 
-    if (!isAgeConfirmed || isDrawing) return;
+    if (isDrawing) return;
 
-    // Clamp highest number on use
-    const clamped = clampHighest(highestInput);
-    setHighestNumber(clamped);
-    highestNumberRef.current = clamped;
-    setHighestInput(String(clamped));
+    sound.init();
 
     if (gameState === 'idle') {
-      let effectiveRounds = rounds;
-      if (effectiveRounds > clamped) {
-        effectiveRounds = clamped;
-        setRounds(effectiveRounds);
-      }
-      setActiveTotalRounds(effectiveRounds);
-      activeTotalRoundsRef.current = effectiveRounds;
+      const startRounds = Math.min(effectiveRounds, availablePool.length);
+      setRounds(startRounds);
+      setActiveTotalRounds(startRounds);
+      activeTotalRoundsRef.current = startRounds;
       setDrawnBalls([]);
       drawnBallsRef.current = [];
     }
@@ -124,6 +149,7 @@ export default function App() {
     setGameState('mixing');
     setStatusText('Mixing the balls…');
     setAirTarget(1);
+    sound.playMixing();
 
     // Step 2: At 3.2s -> airTarget = 0, status "And the number is…"
     timer1Ref.current = setTimeout(() => {
@@ -132,191 +158,114 @@ export default function App() {
       setStatusText('And the number is…');
     }, 3200);
 
-    // Step 3: At 4.7s -> pick random number, append tray ball, replace ball
+    // Step 3: At 4.7s -> pick position from availablePool and trigger floating reveal ball
     timer2Ref.current = setTimeout(() => {
-      const currentHighest = highestNumberRef.current;
       const prevDrawn = drawnBallsRef.current;
-      const drawnSet = new Set(prevDrawn.map((b) => b.num));
-      const available = [];
+      const drawnIds = new Set(prevDrawn.map((b) => b.positionId));
 
-      for (let i = 1; i <= currentHighest; i++) {
-        if (!drawnSet.has(i)) {
-          available.push(i);
-        }
-      }
-
+      // Pick a random position matching the spiciness level not yet drawn in this session
+      const unpicked = availablePool.filter((p) => !drawnIds.has(p.id));
       const chosen =
-        available.length > 0
-          ? available[Math.floor(Math.random() * available.length)]
-          : Math.floor(Math.random() * currentHighest) + 1;
+        unpicked.length > 0
+          ? unpicked[Math.floor(Math.random() * unpicked.length)]
+          : availablePool[Math.floor(Math.random() * availablePool.length)];
 
       const color = BALL_COLORS[prevDrawn.length % BALL_COLORS.length];
-      const newDrawn = [
-        ...prevDrawn,
-        {
-          id: `${Date.now()}-${chosen}`,
-          num: chosen,
-          color,
-          darkColor: darkenColor(color, 0.55),
-        },
-      ];
+      const newBall = {
+        ...chosen,
+        id: `${Date.now()}-${chosen.id}`,
+        positionId: chosen.id,
+        num: chosen.id,
+        name: chosen.name,
+        color,
+        darkColor: darkenColor(color, 0.55),
+      };
 
-      setDrawnBalls(newDrawn);
-      drawnBallsRef.current = newDrawn;
-
-      // Physics: remove one random ball and add fresh one to keep 20 balls full
+      // Physics: replace one random ball inside the machine
       machineRef.current?.removeAndReplaceBall();
 
-      const total = activeTotalRoundsRef.current;
-      if (newDrawn.length < total) {
-        setStatusText(`Number ${chosen}!`);
-        setBtnText(`Draw ball ${newDrawn.length + 1} of ${total}`);
-        setGameState('drawn');
-      } else {
-        const roundWord = total === 1 ? 'round' : 'rounds';
-        setStatusText(`Number ${chosen}! That's all ${total} ${roundWord}.`);
-        setBtnText('Play again');
-        setGameState('finished');
-      }
+      // Launch floating center reveal
+      setGameState('revealing');
+      setStatusText(`Ball #${chosen.id} emerging! Tap to open!`);
+      setActiveFloatingBall(newBall);
     }, 4700);
   };
 
+  // Called when the floating reveal sequence finishes and ball settles into tray
+  const handleFloatingComplete = (completedBall) => {
+    setActiveFloatingBall(null);
+
+    const nextDrawn = [...drawnBallsRef.current, completedBall];
+    setDrawnBalls(nextDrawn);
+    drawnBallsRef.current = nextDrawn;
+
+    const total = activeTotalRoundsRef.current;
+    if (nextDrawn.length < total) {
+      setStatusText(`Number ${completedBall.num}!`);
+      setBtnText(`Draw ball ${nextDrawn.length + 1} of ${total}`);
+      setGameState('drawn');
+    } else {
+      const roundWord = total === 1 ? 'round' : 'rounds';
+      setStatusText(`Number ${completedBall.num}! That's all ${total} ${roundWord}.`);
+      setBtnText('Play again');
+      setGameState('finished');
+    }
+  };
+
   return (
-    <main className="app-wrapper">
-      {/* 1. Title */}
-      <h1 className="app-title">Roll the Night</h1>
+    <>
+      {/* One-time Age Gate on first visit */}
+      {!isAgeVerified && (
+        <AgeGate onVerified={() => setIsAgeVerified(true)} />
+      )}
 
-      {/* 2. Subtitle */}
-      <p className="app-subtitle">
-        Choose how many rounds you're up for. The machine picks the positions.
-      </p>
+      <main className="app-wrapper">
+        {/* 1. Header (Title + Subtitle + Sound Toggle) */}
+        <Header isMuted={isMuted} onToggleSound={handleToggleSound} />
 
-      {/* 3. The Machine */}
-      <section className="machine-stage" aria-label="Lottery machine stage">
-        <BallMachine ref={machineRef} airTarget={airTarget} />
-        <div className="machine-chute" aria-hidden="true" />
-      </section>
+        {/* 2. The Machine Stage (Canvas Sphere + Chute) */}
+        <MachineStage ref={machineRef} airTarget={airTarget} />
 
-      {/* 4. Status Line */}
-      <div className="status-line" role="status" aria-live="polite">
-        {statusText}
-      </div>
+        {/* 3. Status Line */}
+        <StatusLine message={statusText} />
 
-      {/* 5. Rounded Settings Panel */}
-      <section className="settings-panel" aria-label="Game settings">
-        {/* Rounds row */}
-        <div className="setting-row">
-          <div className="setting-text-col">
-            <span className="setting-label" id="rounds-label">
-              Rounds
-            </span>
-            <span className="setting-helper">How many are you up for?</span>
-          </div>
-          <div className="stepper-control" role="group" aria-labelledby="rounds-label">
-            <button
-              type="button"
-              className="stepper-btn"
-              onClick={handleDecreaseRounds}
-              disabled={isInputsLocked || rounds <= 1}
-              aria-label="Decrease rounds"
-            >
-              −
-            </button>
-            <span className="stepper-number" aria-live="polite">
-              {rounds}
-            </span>
-            <button
-              type="button"
-              className="stepper-btn"
-              onClick={handleIncreaseRounds}
-              disabled={isInputsLocked || rounds >= 10 || rounds >= highestNumber}
-              aria-label="Increase rounds"
-            >
-              +
-            </button>
-          </div>
-        </div>
+        {/* 4. Rounded Settings Panel */}
+        <SettingsPanel
+          rounds={effectiveRounds}
+          maxRounds={maxRounds}
+          spicinessLevels={SPICINESS_LEVELS}
+          selectedSpiciness={selectedSpiciness}
+          poolCount={availablePool.length}
+          isInputsLocked={isInputsLocked}
+          isDrawing={isDrawing}
+          btnText={btnText}
+          onDecreaseRounds={handleDecreaseRounds}
+          onIncreaseRounds={handleIncreaseRounds}
+          onSelectSpiciness={handleSelectSpiciness}
+          onStartOrDraw={handleStartOrDraw}
+        />
 
-        {/* Highest number row */}
-        <div className="setting-row">
-          <div className="setting-text-col">
-            <label htmlFor="highest-number-input" className="setting-label">
-              Highest number
-            </label>
-            <span className="setting-helper">Last entry on the list</span>
-          </div>
-          <div className="highest-input-wrapper">
-            <input
-              id="highest-number-input"
-              type="number"
-              min="10"
-              max="9999"
-              value={highestInput}
-              onChange={handleHighestInputChange}
-              onBlur={handleHighestInputBlur}
-              disabled={isInputsLocked}
-              className="highest-number-input"
-              aria-label="Highest number on position list"
-            />
-          </div>
-        </div>
+        {/* 5. Drawn Balls Tray */}
+        <BallTray drawnBalls={drawnBalls} onBallTap={handleBallTap} />
 
-        {/* 18+ Checkbox */}
-        <label className={`checkbox-row ${isInputsLocked ? 'disabled' : ''}`}>
-          <input
-            type="checkbox"
-            checked={isAgeConfirmed}
-            onChange={(e) => setIsAgeConfirmed(e.target.checked)}
-            disabled={isInputsLocked}
-            className="age-checkbox"
+        {/* 6. Hint Line */}
+        <HintLine isVisible={gameState === 'finished'} />
+
+        {/* 7. Full Pokémon-style Floating Reveal Ball (Pokeball Split + Holo Card Flip) */}
+        {activeFloatingBall && (
+          <FloatingRevealBall
+            ballData={activeFloatingBall}
+            onComplete={handleFloatingComplete}
           />
-          <span>We're both 18 or older</span>
-        </label>
+        )}
 
-        {/* Primary Action Button */}
-        <button
-          type="button"
-          onClick={handleStartOrDraw}
-          disabled={!isAgeConfirmed || isDrawing}
-          className="primary-action-btn"
-        >
-          {btnText}
-        </button>
-      </section>
-
-      {/* 6. Drawn Balls Tray */}
-      {drawnBalls.length > 0 && (
-        <section className="tray" aria-label="Drawn position balls">
-          {drawnBalls.map((ball) => (
-            <a
-              key={ball.id}
-              href={`https://sexpositions.club/positions/${ball.num}.html`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="tray-ball-link tray-drop-anim"
-              aria-label={`Position ${ball.num}, opens in new tab`}
-            >
-              <div
-                className="tray-ball"
-                style={{
-                  '--ball-color': ball.color,
-                  '--ball-color-dark': ball.darkColor,
-                }}
-              >
-                <span>{ball.num}</span>
-              </div>
-              <span className="tray-ball-caption">Reveal #{ball.num}</span>
-            </a>
-          ))}
-        </section>
-      )}
-
-      {/* 7. Hint Line */}
-      {gameState === 'finished' && (
-        <p className="hint-line">
-          Tap a ball to reveal its position. It opens in a new tab.
-        </p>
-      )}
-    </main>
+        {/* 8. Position Reveal Dialog (When tapping existing balls in tray) */}
+        <PositionCard
+          position={revealedPosition}
+          ballColor={revealedBallColor}
+          onClose={handleCloseCard}
+        />
+      </main>
+    </>
   );
 }
