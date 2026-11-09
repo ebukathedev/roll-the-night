@@ -9,3 +9,4 @@ export { default as PositionCard } from './PositionCard';
 export { default as PositionIllustration } from './PositionIllustration';
 export { default as FloatingRevealBall } from './FloatingRevealBall';
 export { default as AgeGate } from './AgeGate';
+export { default as Footer } from './Footer';

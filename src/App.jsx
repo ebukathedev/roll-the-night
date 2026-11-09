@@ -9,6 +9,7 @@ import {
   PositionCard,
   FloatingRevealBall,
   AgeGate,
+  Footer,
 } from './components';
 import positions from './data/positions';
 import { SPICINESS_LEVELS } from './constants/spiciness';
@@ -286,6 +287,9 @@ export default function App() {
           ballColor={revealedBallColor}
           onClose={handleCloseCard}
         />
+
+        {/* 9. Semantic SEO Footer & Disclosures */}
+        <Footer />
       </main>
     </>
   );

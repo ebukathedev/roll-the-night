@@ -39,6 +39,23 @@ When a ball is drawn, the app picks a random position from the built-in database
 
 ## Changelog
 
+### 2026-11-08 – v1.8 – SEO, Social Sharing Cards, Schema.org Structured Data & Discovery
+- **Comprehensive Meta & Social Tags** (`index.html`):
+  - Added targeted high-intent primary meta tags (`title`, `description`, `keywords`, `author`, `robots`, `canonical`).
+  - Implemented Open Graph (`og:type`, `og:site_name`, `og:title`, `og:description`, `og:image`, `og:url`) and Twitter Card (`twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`) metadata for rich visual preview cards on Facebook, Discord, Twitter/X, iMessage, and Slack.
+  - Added mobile PWA meta tags (`theme-color`, `color-scheme`, `apple-mobile-web-app-capable`, `apple-mobile-web-app-status-bar-style`).
+- **Structured Data (JSON-LD)** (`index.html`):
+  - Embedded `Schema.org/WebApplication` with detailed application classification, feature lists, pricing ($0 free web app), and minimum adult age rating (18+).
+  - Embedded `Schema.org/FAQPage` rich snippets answering key discovery questions for search engines.
+- **Search Engine Discovery & PWA** (`public/robots.txt`, `public/sitemap.xml`, `public/site.webmanifest`, `public/og-image.png`, `public/apple-touch-icon.png`):
+  - Added `robots.txt` and XML `sitemap.xml` referencing canonical URLs.
+  - Added `site.webmanifest` for mobile home-screen installability and Lighthouse PWA/SEO compliance.
+  - Generated 16:9 high-definition social banner `og-image.png` and `apple-touch-icon.png`.
+- **Crawler-Accessible Content & Semantic Footer** (`index.html`, `src/components/Footer.jsx`, `src/components/Footer.css`, `src/App.jsx`):
+  - Embedded server-rendered fallback text within `#root` in `index.html` so search bots and crawlers index full keyword content without needing JavaScript execution.
+  - Added semantic `<footer>` with native accessible `<details>` / `<summary>` disclosure (following modern web guidance for `html` and `search-hidden-content`) detailing game rules, categories, spiciness levels, and zero-tracking privacy policy.
+- Touched files: `index.html`, `public/robots.txt` (new), `public/sitemap.xml` (new), `public/site.webmanifest` (new), `public/og-image.png` (new), `public/apple-touch-icon.png` (new), `src/components/Footer.jsx` (new), `src/components/Footer.css` (new), `src/components/index.js`, `src/App.jsx`, `README.md`.
+
 ### 2026-11-08 – v1.7 – Image preloading, background caching & smooth card render
 - **Instant Image Delivery During Ball Agitation** (`src/App.jsx`, `src/utils/preload.js`):
   - Solved live network latency by shifting position selection from $t = 4.7\text{s}$ (post-animation) to $t = 0$ upon clicking "Start the machine" / "Draw ball".
