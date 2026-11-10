@@ -13,6 +13,7 @@ import {
 } from './components';
 import positions from './data/positions';
 import { SPICINESS_LEVELS } from './constants/spiciness';
+import { VIBE_PRESETS, buildVibeFilter } from './constants/vibes';
 import { BALL_COLORS, darkenColor } from './utils/colors';
 import { sound } from './utils/sound';
 import { checkAgeVerified } from './utils/storage';
@@ -25,6 +26,15 @@ export default function App() {
 
   // Spiciness level mode
   const [selectedSpiciness, setSelectedSpiciness] = useState('spicy');
+
+  // Vibe / focus preset
+  const [selectedVibe, setSelectedVibe] = useState('our-night');
+
+  // Category exclusion set
+  const [excludedCategories, setExcludedCategories] = useState(new Set());
+
+  // Oral sub-filter
+  const [oralSubtype, setOralSubtype] = useState('all-oral');
 
   // Rounds stepper
   const [rounds, setRounds] = useState(3);
@@ -52,13 +62,18 @@ export default function App() {
   const drawnBallsRef = useRef([]);
   const pendingBallRef = useRef(null);
 
-  // Compute filtered positions pool based on selected Spiciness level
+  // Compute filtered positions pool: Spiciness → Vibe (categories + oral sub-filter)
   const currentSpicinessDef =
     SPICINESS_LEVELS.find((s) => s.id === selectedSpiciness) || SPICINESS_LEVELS[0];
 
+  const vibeFilter = useMemo(
+    () => buildVibeFilter(excludedCategories, oralSubtype),
+    [excludedCategories, oralSubtype],
+  );
+
   const availablePool = useMemo(() => {
-    return positions.filter(currentSpicinessDef.filter);
-  }, [currentSpicinessDef]);
+    return positions.filter((p) => currentSpicinessDef.filter(p) && vibeFilter(p));
+  }, [currentSpicinessDef, vibeFilter]);
 
   const maxRounds = Math.min(10, Math.max(1, availablePool.length));
   const effectiveRounds = Math.min(rounds, maxRounds);
@@ -107,15 +122,82 @@ export default function App() {
     setRounds(effectiveRounds + 1);
   };
 
+  // Clamp rounds to new pool size after any filter change
+  const clampRoundsToPool = (pool) => {
+    const newMax = Math.min(10, Math.max(1, pool.length));
+    if (rounds > newMax) {
+      setRounds(newMax);
+    }
+  };
+
   const handleSelectSpiciness = (spicinessId) => {
     if (isInputsLocked) return;
     setSelectedSpiciness(spicinessId);
     const newDef = SPICINESS_LEVELS.find((s) => s.id === spicinessId) || SPICINESS_LEVELS[0];
-    const newPool = positions.filter(newDef.filter);
-    const newMax = Math.min(10, Math.max(1, newPool.length));
-    if (rounds > newMax) {
-      setRounds(newMax);
+    const newPool = positions.filter((p) => newDef.filter(p) && vibeFilter(p));
+    clampRoundsToPool(newPool);
+  };
+
+  const handleSelectVibe = (vibeId) => {
+    if (isInputsLocked) return;
+    setSelectedVibe(vibeId);
+
+    const preset = VIBE_PRESETS.find((v) => v.id === vibeId);
+    if (!preset) return;
+
+    // Apply the preset's defaults for excluded categories and oral sub-type
+    const newExcluded = new Set(preset.excludedCategories);
+    setExcludedCategories(newExcluded);
+    setOralSubtype(preset.oralSubtype);
+
+    // Re-compute pool and clamp
+    const newVibeFilter = buildVibeFilter(newExcluded, preset.oralSubtype);
+    const newPool = positions.filter((p) => currentSpicinessDef.filter(p) && newVibeFilter(p));
+    clampRoundsToPool(newPool);
+  };
+
+  const handleToggleCategory = (category) => {
+    if (isInputsLocked) return;
+
+    // Switch to "custom" vibe when user manually changes categories
+    if (selectedVibe !== 'custom') {
+      setSelectedVibe('custom');
     }
+
+    setExcludedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(category)) {
+        next.delete(category);
+      } else {
+        next.add(category);
+      }
+
+      // Clamp rounds after update
+      const newVibeFilter = buildVibeFilter(next, oralSubtype);
+      const newPool = positions.filter((p) => currentSpicinessDef.filter(p) && newVibeFilter(p));
+      const newMax = Math.min(10, Math.max(1, newPool.length));
+      if (rounds > newMax) {
+        setRounds(newMax);
+      }
+
+      return next;
+    });
+  };
+
+  const handleSelectOralSubtype = (subtypeId) => {
+    if (isInputsLocked) return;
+
+    // Switch to "custom" vibe when user manually tweaks oral filter
+    if (selectedVibe !== 'custom') {
+      setSelectedVibe('custom');
+    }
+
+    setOralSubtype(subtypeId);
+
+    // Clamp rounds after update
+    const newVibeFilter = buildVibeFilter(excludedCategories, subtypeId);
+    const newPool = positions.filter((p) => currentSpicinessDef.filter(p) && newVibeFilter(p));
+    clampRoundsToPool(newPool);
   };
 
   const handleBallTap = (ball) => {
@@ -146,6 +228,7 @@ export default function App() {
     }
 
     if (isDrawing) return;
+    if (availablePool.length === 0) return;
 
     sound.init();
 
@@ -265,6 +348,13 @@ export default function App() {
           onIncreaseRounds={handleIncreaseRounds}
           onSelectSpiciness={handleSelectSpiciness}
           onStartOrDraw={handleStartOrDraw}
+          vibePresets={VIBE_PRESETS}
+          selectedVibe={selectedVibe}
+          onSelectVibe={handleSelectVibe}
+          excludedCategories={excludedCategories}
+          onToggleCategory={handleToggleCategory}
+          oralSubtype={oralSubtype}
+          onSelectOralSubtype={handleSelectOralSubtype}
         />
 
         {/* 5. Drawn Balls Tray */}

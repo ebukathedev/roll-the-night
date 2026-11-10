@@ -1,0 +1,50 @@
+{
+ "start": "2026-11-10T18:39:20.565Z",
+ "round": 0,
+ "idle": 0,
+ "errors": 1,
+ "status": "error",
+ "history": [
+  {
+   "at": "2026-11-10T18:46:05.460Z",
+   "mode": "manual",
+   "status": "error",
+   "fails": 0,
+   "round": 0,
+   "reused": false,
+   "stopHookActive": false
+  }
+ ],
+ "max": 3,
+ "marker": {
+  "page": "dist/index.html",
+  "dir": "/Users/ebukathedev/code/projects/roll-the-night",
+  "kind": "gaming",
+  "start": "2026-11-10T18:39:20.565Z",
+  "by": "start.mjs",
+  "url": null,
+  "root": "dist",
+  "category": "lottery ball machine and intimacy positions",
+  "primary": "Start the machine"
+ },
+ "manual": true,
+ "fp": "56ea4d1d760bd394",
+ "page": "dist/index.html",
+ "found": {
+  "fails": [],
+  "warns": [],
+  "crashed": [
+   "consistency.mjs gave no report (exit 1: Error: Chrome exited early (null))",
+   "check.mjs could not run (exit 2: check: Chrome did not start)"
+  ],
+  "seconds": {
+   "consistency": 6,
+   "layout": 15
+  }
+ },
+ "open": [],
+ "waived": [],
+ "warnCount": 0,
+ "note": "consistency.mjs gave no report (exit 1: Error: Chrome exited early (null)); check.mjs could not run (exit 2: check: Chrome did not start)",
+ "at": "2026-11-10T18:46:05.461Z"
+}

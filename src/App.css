@@ -1,15 +1,19 @@
+/* ── App Wrapper & Layout (Equal Edges & Clean Rhythm) ── */
 .app-wrapper {
   width: 100%;
-  max-width: 560px;
+  max-width: 540px;
   margin: 0 auto;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
 
+/* ── 1. Header & Typography ────────────────────────────── */
 .app-header {
   width: 100%;
+  margin-bottom: 20px;
 }
 
 .header-top-row {
@@ -18,6 +22,36 @@
   justify-content: center;
   position: relative;
   width: 100%;
+  margin-bottom: 6px;
+}
+
+.header-brand-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.app-eyebrow {
+  font-family: var(--font-brand);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--gold);
+  opacity: 0.9;
+  margin-bottom: 4px;
+}
+
+.app-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.3rem, 7.5vw, 3.1rem);
+  line-height: 1.05;
+  margin: 0;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #ffffff 0%, #ffe9b8 60%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(251, 192, 45, 0.28));
 }
 
 .sound-toggle-btn {
@@ -26,55 +60,61 @@
   top: 50%;
   transform: translateY(-50%);
   background: var(--panel);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--line);
+  box-shadow: var(--panel-inner-highlight);
   border-radius: 50%;
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   font-size: 1.15rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.15s ease, background-color 0.15s ease;
+  transition: transform var(--m-fast) var(--ease),
+              background-color var(--m-fast) var(--ease),
+              border-color var(--m-fast) var(--ease),
+              box-shadow var(--m-fast) var(--ease);
   user-select: none;
 }
 
 .sound-toggle-btn:hover {
-  transform: translateY(-50%) scale(1.1);
-  background: var(--line);
+  transform: translateY(-50%) scale(1.08);
+  background: var(--panel-hover);
+  border-color: var(--line-strong);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.sound-toggle-btn:active {
+  transform: translateY(-50%) scale(0.94);
 }
 
 .sound-toggle-btn.muted {
-  opacity: 0.6;
+  opacity: 0.55;
+  filter: grayscale(0.5);
 }
 
-/* 1. Title */
-.app-title {
-  font-family: var(--font-display);
-  color: var(--gold);
-  text-shadow: 0 3px 0 var(--accent);
-  font-size: clamp(2.2rem, 7vw, 3rem);
-  line-height: 1.1;
-  margin: 0 0 10px 0;
-  letter-spacing: 0.5px;
+.sound-icon {
+  line-height: 1;
 }
 
-/* 2. Subtitle */
 .app-subtitle {
   color: var(--muted);
   max-width: 42ch;
-  margin: 0 auto 16px auto;
-  font-size: 1.05rem;
-  line-height: 1.45;
+  margin: 8px auto 0 auto;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  font-weight: 400;
 }
 
-/* 3. The Machine */
+/* ── 2. The Machine Stage (Canvas Sphere + Chute) ───────── */
 .machine-stage {
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
-  margin: 0 auto 18px auto;
+  margin: 0 auto 16px auto;
 }
 
 .machine-canvas {
@@ -83,18 +123,20 @@
   aspect-ratio: 1 / 1;
   display: block;
   border-radius: 50%;
-  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.3));
+  filter: drop-shadow(0 16px 36px rgba(0, 0, 0, 0.45));
+  position: relative;
+  z-index: 1;
 }
 
 .machine-chute {
-  width: 64px;
-  height: 26px;
-  margin-top: -8px;
-  border-radius: 0 0 14px 14px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, var(--line) 40%, var(--panel) 100%);
-  border: 2px solid var(--line);
+  width: 68px;
+  height: 28px;
+  margin-top: -10px;
+  border-radius: 0 0 16px 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(60, 42, 100, 0.8) 45%, var(--panel-solid) 100%);
+  border: 1.5px solid var(--line-strong);
   border-top: none;
-  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.4), 0 6px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.5), 0 8px 16px rgba(0, 0, 0, 0.35);
   position: relative;
   z-index: 2;
 }
@@ -105,36 +147,47 @@
   top: 4px;
   left: 50%;
   transform: translateX(-50%);
-  width: 32px;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.2);
+  width: 34px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.35);
   border-radius: 2px;
 }
 
-/* 4. Status Line */
+/* ── 3. Status Line ─────────────────────────────────────── */
 .status-line {
-  font-weight: 700;
-  font-size: 1.1rem;
-  min-height: 1.7rem;
+  font-family: var(--font-brand);
+  font-weight: 600;
+  font-size: 0.95rem;
+  min-height: 2rem;
   color: var(--text);
-  margin: 0 0 16px 0;
+  margin: 0 0 18px 0;
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 4px 16px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  letter-spacing: 0.2px;
 }
 
-/* 5. Rounded Settings Panel */
+/* ── 4. Settings Panel (Glassmorphism + Structured Flow) ── */
 .settings-panel {
   width: 100%;
   background-color: var(--panel);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--line);
-  border-radius: 18px;
+  box-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.38),
+    var(--panel-inner-highlight);
+  border-radius: 22px;
   padding: 22px 20px;
   display: flex;
   flex-direction: column;
   gap: 18px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
 }
 
 .setting-row {
@@ -152,18 +205,20 @@
 }
 
 .setting-label {
+  font-family: var(--font-brand);
   font-weight: 700;
   font-size: 1.05rem;
   color: var(--text);
+  letter-spacing: -0.01em;
 }
 
 .setting-helper {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   color: var(--muted);
   margin-top: 2px;
 }
 
-/* Stepper */
+/* ── Stepper ────────────────────────────────────────────── */
 .stepper-control {
   display: flex;
   align-items: center;
@@ -172,11 +227,11 @@
 }
 
 .stepper-btn {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   border: 1px solid var(--line);
-  background-color: var(--bg);
+  background-color: var(--panel-solid);
   color: var(--text);
   font-family: var(--font-display);
   font-size: 1.25rem;
@@ -184,12 +239,18 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.1s ease, background-color 0.15s ease, opacity 0.15s ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: transform var(--m-fast) var(--ease),
+              background-color var(--m-fast) var(--ease),
+              border-color var(--m-fast) var(--ease),
+              opacity var(--m-fast) var(--ease);
   user-select: none;
 }
 
 .stepper-btn:hover:not(:disabled) {
-  background-color: var(--line);
+  background-color: var(--panel-hover);
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
 }
 
 .stepper-btn:active:not(:disabled) {
@@ -208,11 +269,12 @@
   min-width: 38px;
   text-align: center;
   line-height: 1;
+  text-shadow: 0 0 16px var(--gold-glow);
 }
 
-/* ── Spiciness Level Selector ────────────────────────────── */
-
-.spiciness-section {
+/* ── Spiciness & Vibe Sections ──────────────────────────── */
+.spiciness-section,
+.vibe-section {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -221,58 +283,86 @@
   width: 100%;
 }
 
-.spiciness-badge-pill {
+.spiciness-badge-pill,
+.vibe-badge-pill {
+  font-family: var(--font-brand);
   font-size: 0.72rem;
   font-weight: 800;
   color: var(--gold);
-  background: rgba(255, 200, 61, 0.16);
+  background: var(--gold-subtle);
   border: 1px solid var(--gold);
-  border-radius: 12px;
-  padding: 3px 9px;
+  border-radius: 9999px;
+  padding: 3px 10px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
 }
 
-.spiciness-pills-row {
+.vibe-badge-pill {
+  color: var(--accent);
+  background: rgba(255, 51, 119, 0.12);
+  border-color: var(--accent);
+}
+
+.spiciness-pills-row,
+.vibe-pills-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   width: 100%;
 }
 
-.spiciness-pill-btn {
-  background: var(--bg);
-  border: 1.5px solid var(--line);
+.spiciness-pill-btn,
+.vibe-pill-btn {
+  background: var(--panel-solid);
+  border: 1px solid var(--line);
   border-radius: 14px;
   padding: 10px 4px 8px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 4px;
   cursor: pointer;
-  color: var(--text);
-  transition: all 0.15s ease;
+  color: var(--text-secondary);
+  transition: all var(--m-fast) var(--ease);
   user-select: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-.spiciness-pill-btn:hover:not(:disabled) {
-  border-color: var(--muted);
-  background: rgba(255, 255, 255, 0.05);
+.spiciness-pill-btn:hover:not(:disabled),
+.vibe-pill-btn:hover:not(:disabled) {
+  border-color: var(--line-strong);
+  background: var(--panel-hover);
+  color: var(--text);
+  transform: translateY(-1px);
 }
 
 .spiciness-pill-btn.selected {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--accent-gradient);
+  border-color: transparent;
   color: #ffffff;
-  box-shadow: 0 4px 0 var(--accent-shadow), 0 4px 14px rgba(255, 61, 129, 0.3);
+  box-shadow:
+    0 4px 16px var(--accent-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transform: translateY(-2px);
 }
 
-.spiciness-pill-btn:disabled {
-  opacity: 0.5;
+.vibe-pill-btn.selected {
+  background: linear-gradient(135deg, rgba(255, 200, 61, 0.22) 0%, rgba(255, 61, 129, 0.28) 100%), var(--panel-solid);
+  border-color: var(--gold);
+  color: #ffffff;
+  box-shadow:
+    0 4px 16px rgba(255, 200, 61, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.spiciness-pill-btn:disabled,
+.vibe-pill-btn:disabled {
+  opacity: 0.45;
   cursor: not-allowed;
+  transform: none !important;
 }
 
 .pill-icon {
@@ -281,20 +371,22 @@
 }
 
 .pill-label {
-  font-size: 0.75rem;
+  font-family: var(--font-brand);
+  font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.2px;
 }
 
-.spiciness-info-box {
+.spiciness-info-box,
+.vibe-info-box {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 8px 14px;
+  padding: 9px 14px;
   text-align: left;
 }
 
@@ -303,65 +395,288 @@
   color: var(--muted);
   margin: 0;
   flex: 1;
-  line-height: 1.35;
+  line-height: 1.4;
 }
 
 .spiciness-pool-count {
-  font-size: 0.75rem;
+  font-family: var(--font-brand);
+  font-size: 0.74rem;
   font-weight: 700;
   color: var(--gold);
   white-space: nowrap;
-  background: rgba(255, 200, 61, 0.12);
+  background: var(--gold-subtle);
   border-radius: 8px;
-  padding: 2px 7px;
+  padding: 3px 8px;
+  border: 1px solid rgba(251, 192, 45, 0.2);
 }
 
-.age-checkbox:disabled {
-  cursor: not-allowed;
+/* ── 5. Category & Oral Filter Drawer ───────────────────── */
+.filter-section {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  width: 100%;
 }
 
-/* Primary Action Button */
+.filter-toggle-btn {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-brand);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--m-fast) var(--ease);
+  user-select: none;
+}
+
+.filter-toggle-btn:hover:not(:disabled) {
+  background: var(--panel-hover);
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+
+.filter-toggle-btn.open {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--line-strong);
+  color: var(--text);
+}
+
+.filter-toggle-icon {
+  font-size: 0.8rem;
+  transition: transform var(--m-fast) var(--ease);
+  color: var(--muted);
+}
+
+.filter-active-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: rgba(255, 51, 119, 0.15);
+  border: 1px solid rgba(255, 51, 119, 0.3);
+  padding: 2px 8px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.filter-details {
+  margin-top: 12px;
+  padding: 14px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: filterFadeIn var(--m-fast) var(--ease);
+}
+
+@keyframes filterFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.category-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.category-toggle-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: var(--font-brand);
+  cursor: pointer;
+  border: 1px solid var(--line);
+  transition: all var(--m-fast) var(--ease);
+  user-select: none;
+}
+
+.category-checkbox-hidden {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.category-toggle-chip.included {
+  background: rgba(120, 60, 220, 0.16);
+  border-color: rgba(180, 140, 255, 0.35);
+  color: var(--text);
+}
+
+.category-toggle-chip.included:hover {
+  background: rgba(120, 60, 220, 0.28);
+  border-color: rgba(180, 140, 255, 0.6);
+  transform: translateY(-1px);
+}
+
+.category-toggle-chip.included .category-chip-check {
+  color: var(--gold);
+}
+
+.category-toggle-chip.excluded {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--muted-dim);
+  opacity: 0.65;
+}
+
+.category-toggle-chip.excluded:hover {
+  opacity: 0.9;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.category-toggle-chip.excluded .category-chip-check {
+  color: #ff5277;
+}
+
+.category-chip-check {
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.category-chip-label {
+  line-height: 1;
+}
+
+/* ── Oral Sub-Filter ────────────────────────────────────── */
+.oral-sub-section {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.oral-sub-heading {
+  font-family: var(--font-brand);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--gold);
+}
+
+.oral-sub-pills {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.oral-sub-btn {
+  background: var(--panel-solid);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 4px;
+  font-family: var(--font-brand);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--m-fast) var(--ease);
+  text-align: center;
+}
+
+.oral-sub-btn:hover:not(:disabled) {
+  border-color: var(--line-strong);
+  background: var(--panel-hover);
+  color: var(--text);
+}
+
+.oral-sub-btn.selected {
+  background: var(--gold);
+  color: #17102b;
+  border-color: var(--gold);
+  font-weight: 700;
+  box-shadow: 0 2px 8px var(--gold-glow);
+}
+
+/* ── 6. Primary Action Button ───────────────────────────── */
 .primary-action-btn {
   width: 100%;
   padding: 16px 20px;
-  border-radius: 14px;
+  border-radius: 16px;
   border: none;
-  background-color: var(--accent);
+  background: var(--accent-gradient);
   color: #ffffff;
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  letter-spacing: 0.5px;
+  font-family: var(--font-brand);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
   cursor: pointer;
-  box-shadow: 0 5px 0 var(--accent-shadow);
+  box-shadow:
+    0 8px 24px var(--accent-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transform: translateY(0);
-  transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.15s ease, filter 0.15s ease;
+  transition: transform var(--m-fast) var(--ease),
+              box-shadow var(--m-fast) var(--ease),
+              filter var(--m-fast) var(--ease),
+              opacity var(--m-fast) var(--ease);
   user-select: none;
 }
 
 .primary-action-btn:hover:not(:disabled) {
-  filter: brightness(1.06);
+  filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow:
+    0 12px 28px var(--accent-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .primary-action-btn:active:not(:disabled) {
-  transform: translateY(4px);
-  box-shadow: 0 1px 0 var(--accent-shadow);
+  transform: translateY(1px) scale(0.985);
+  box-shadow:
+    0 4px 12px var(--accent-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .primary-action-btn:disabled {
-  opacity: 0.42;
+  opacity: 0.45;
   cursor: not-allowed;
-  box-shadow: 0 3px 0 var(--accent-shadow);
-  transform: translateY(2px);
+  transform: none;
+  box-shadow: none;
+  background: var(--panel-solid);
+  border: 1px solid var(--line);
+  color: var(--muted);
 }
 
-/* 6. Tray */
+/* ── 7. Ball Tray (Smoked Acrylic Dock Aesthetic) ───────── */
 .tray {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 14px;
+  gap: 16px;
   width: 100%;
   margin-top: 24px;
+  padding: 16px 12px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.tray:empty {
+  display: none;
 }
 
 .tray-ball-link {
@@ -372,15 +687,15 @@
   color: inherit;
   border: none;
   background: none;
-  border-radius: 14px;
+  border-radius: 16px;
   padding: 6px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: transform var(--m-fast) var(--ease);
 }
 
 .tray-ball {
-  width: 76px;
-  height: 76px;
+  width: 74px;
+  height: 74px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -389,21 +704,23 @@
   font-family: var(--font-display);
   font-size: 1.45rem;
   color: #ffffff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.45);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   background:
-    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.4) 14%, rgba(255, 255, 255, 0) 30%),
+    radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.45) 14%, rgba(255, 255, 255, 0) 32%),
     radial-gradient(circle at 48% 48%, var(--ball-color) 0%, var(--ball-color-dark) 100%);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.42);
+  transition: transform var(--m-fast) var(--ease),
+              box-shadow var(--m-fast) var(--ease);
 }
 
 .tray-ball-link:hover .tray-ball,
 .tray-ball-link:focus-visible .tray-ball {
-  transform: translateY(-3px) scale(1.06);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+  transform: translateY(-4px) scale(1.06);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.55);
 }
 
 .tray-ball-caption {
+  font-family: var(--font-brand);
   font-weight: 700;
   font-size: 0.85rem;
   color: var(--text);
@@ -414,15 +731,15 @@
 /* Drop Animation */
 @keyframes trayDrop {
   0% {
-    transform: translateY(-70px) scale(0.4);
+    transform: translateY(-60px) scale(0.4);
     opacity: 0;
   }
   65% {
-    transform: translateY(8px) scale(1.06);
+    transform: translateY(6px) scale(1.04);
     opacity: 1;
   }
   85% {
-    transform: translateY(-3px) scale(0.98);
+    transform: translateY(-2px) scale(0.98);
   }
   100% {
     transform: translateY(0) scale(1);
@@ -431,7 +748,7 @@
 }
 
 .tray-drop-anim {
-  animation: trayDrop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: trayDrop 0.5s var(--ease-spring) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -440,31 +757,49 @@
   }
 }
 
-/* 7. Hint Line */
+/* ── 8. Hint Line ───────────────────────────────────────── */
 .hint-line {
-  font-size: 0.95rem;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
   color: var(--muted);
   margin-top: 16px;
-  line-height: 1.4;
+  line-height: 1.45;
   padding: 0 12px;
 }
 
-@media (max-width: 400px) {
+/* ── 9. Mobile Responsiveness ───────────────────────────── */
+@media (max-width: 440px) {
   .settings-panel {
     padding: 18px 14px;
     gap: 16px;
+    border-radius: 18px;
   }
 
   .setting-label {
-    font-size: 0.95rem;
+    font-size: 0.98rem;
   }
 
   .setting-helper {
     font-size: 0.8rem;
   }
 
+  .spiciness-pills-row,
+  .vibe-pills-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .oral-sub-pills {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
   .primary-action-btn {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     padding: 14px 16px;
+  }
+
+  .tray-ball {
+    width: 64px;
+    height: 64px;
+    font-size: 1.25rem;
   }
 }

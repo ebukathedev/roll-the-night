@@ -39,6 +39,21 @@ When a ball is drawn, the app picks a random position from the built-in database
 
 ## Changelog
 
+### 2026-11-10 – v1.9 – Design Taste & Refined Glassmorphic UI Overhaul
+- **Design Taste System Implementation** (`src/index.css`, `src/App.css`, `index.html`):
+  - Applied `design-taste-frontend` rules: clean velvet midnight luxury palette (`#0c0817`), luminous glassmorphism (`backdrop-filter: blur(20px)` with `rgba(23, 16, 42, 0.74)`), and 1px inner specular highlights.
+  - Integrated `Sora` geometric brand typography alongside `Figtree` and arcade `Bungee`, with tight title tracking, metallic gradient text, and an ambient gold glow.
+- **Complete Settings Panel & Filter Styling** (`src/App.css`, `src/components/Header.jsx`):
+  - Added brand eyebrow badge (`✦ Couple's Lottery & Intimacy Game ✦`) and refined frosted glass sound toggle.
+  - Styled Vibe preset buttons (`Our Night`, `His Night`, `Her Night`, `Custom`) with segmented radio aesthetics and active glowing borders.
+  - Built interactive category fine-tune drawer with collapsible trigger, active badge pill (`X excluded`), and tactile check chips (`.category-toggle-chip`).
+  - Added responsive 6-option oral sub-filter pill selector (`All Oral`, `Blowjob Only`, `Cunnilingus Only`, `69 Only`, `No Cunnilingus`, `No Blowjob`).
+- **Elevated CTA & Micro-Interactions** (`src/App.css`, `src/components/AgeGate.css`, `src/components/PositionCard.css`, `src/components/Footer.css`):
+  - Upgraded primary action buttons to rich gradients (`#ff3d81` → `#db175e`) with top specular highlight, smooth hover lift, and press sink.
+  - Polished smoked acrylic ball tray dock with dynamic colored shadows and smooth hover scale.
+  - Elevated Age Gate and Position Card modals with glass blur backdrops and unified radius tokens.
+- Touched files: `index.html`, `eslint.config.js`, `src/index.css`, `src/App.css`, `src/components/Header.jsx`, `src/components/AgeGate.css`, `src/components/PositionCard.css`, `src/components/Footer.css`, `README.md`.
+
 ### 2026-11-08 – v1.8 – SEO, Social Sharing Cards, Schema.org Structured Data & Discovery
 - **Comprehensive Meta & Social Tags** (`index.html`):
   - Added targeted high-intent primary meta tags (`title`, `description`, `keywords`, `author`, `robots`, `canonical`).

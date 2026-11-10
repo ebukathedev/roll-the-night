@@ -4,17 +4,19 @@
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: radial-gradient(ellipse 90% 70% at 50% 20%, #4a2a8a 0%, #1a1030 75%);
+  background: radial-gradient(ellipse 90% 70% at 50% 20%, rgba(84, 43, 156, 0.85) 0%, rgba(12, 8, 23, 0.95) 75%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  animation: gateFadeIn 0.4s ease-out forwards;
+  animation: gateFadeIn 0.35s var(--ease) forwards;
 }
 
 .age-gate-overlay.fade-out {
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.35s var(--ease);
 }
 
 @keyframes gateFadeIn {
@@ -28,26 +30,28 @@
 
 .age-gate-card {
   width: 100%;
-  max-width: 460px;
+  max-width: 440px;
   background-color: var(--panel);
-  border: 1px solid var(--line);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--line-strong);
   border-radius: 24px;
   padding: 36px 28px 28px;
   text-align: center;
   box-shadow:
-    0 24px 70px rgba(0, 0, 0, 0.55),
-    0 0 0 1px var(--line),
-    0 0 50px rgba(255, 61, 129, 0.2);
+    0 24px 64px rgba(0, 0, 0, 0.6),
+    var(--panel-inner-highlight),
+    0 0 40px rgba(255, 51, 119, 0.15);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 14px;
-  animation: cardPopUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: cardPopUp 0.45s var(--ease-spring) forwards;
 }
 
 @keyframes cardPopUp {
   0% {
-    transform: translateY(30px) scale(0.92);
+    transform: translateY(24px) scale(0.94);
     opacity: 0;
   }
   100% {
@@ -62,25 +66,25 @@
   width: 82px;
   height: 82px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #ffc83d 0%, #ff3d81 65%, #42103e 100%);
-  border: 4px solid #ffffff;
+  background: radial-gradient(circle at 35% 30%, #ffc83d 0%, #ff3377 65%, #3d0d38 100%);
+  border: 3px solid rgba(255, 255, 255, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 30px rgba(255, 61, 129, 0.65), 0 8px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 30px rgba(255, 51, 119, 0.5), 0 8px 20px rgba(0, 0, 0, 0.4);
   margin-top: -6px;
   margin-bottom: 4px;
-  animation: pulseCrest 2.4s ease-in-out infinite;
+  animation: pulseCrest 2.6s ease-in-out infinite;
 }
 
 @keyframes pulseCrest {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 25px rgba(255, 61, 129, 0.5);
+    box-shadow: 0 0 24px rgba(255, 51, 119, 0.45);
   }
   50% {
-    transform: scale(1.06);
-    box-shadow: 0 0 45px rgba(255, 200, 61, 0.7);
+    transform: scale(1.05);
+    box-shadow: 0 0 40px rgba(251, 192, 45, 0.6);
   }
 }
 
@@ -96,27 +100,29 @@
 
 .gate-title {
   font-family: var(--font-display);
-  color: var(--gold);
-  text-shadow: 0 3px 0 var(--accent);
-  font-size: clamp(1.8rem, 6vw, 2.4rem);
+  font-size: clamp(1.8rem, 6vw, 2.3rem);
   line-height: 1.1;
   margin: 0;
-  letter-spacing: 0.5px;
+  letter-spacing: -0.01em;
+  background: linear-gradient(180deg, #ffffff 0%, #ffe9b8 60%, var(--gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .gate-tagline {
   color: var(--muted);
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-family: var(--font-brand);
+  font-size: 0.85rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  margin: -6px 0 6px 0;
+  letter-spacing: 1.2px;
+  margin: -4px 0 4px 0;
 }
 
 /* ── Notice Box ─────────────────────────────────────────── */
 
 .gate-notice-box {
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.28);
   border: 1px solid var(--line);
   border-radius: 14px;
   padding: 14px 18px;
@@ -124,8 +130,8 @@
 }
 
 .gate-notice-text {
-  color: var(--text);
-  font-size: 0.92rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
   line-height: 1.5;
   margin: 0;
 }
@@ -146,28 +152,37 @@
 
 .gate-enter-btn {
   width: 100%;
-  padding: 15px 20px;
-  border-radius: 14px;
+  padding: 16px 20px;
+  border-radius: 16px;
   border: none;
-  background-color: var(--accent);
+  background: var(--accent-gradient);
   color: #ffffff;
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  letter-spacing: 0.5px;
+  font-family: var(--font-brand);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
   cursor: pointer;
-  box-shadow: 0 5px 0 var(--accent-shadow), 0 8px 24px rgba(255, 61, 129, 0.35);
+  box-shadow:
+    0 8px 24px var(--accent-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transform: translateY(0);
-  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.15s ease;
+  transition: transform var(--m-fast) var(--ease),
+              box-shadow var(--m-fast) var(--ease),
+              filter var(--m-fast) var(--ease);
   user-select: none;
 }
 
 .gate-enter-btn:hover {
   filter: brightness(1.08);
+  transform: translateY(-2px);
+  box-shadow:
+    0 12px 28px var(--accent-glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .gate-enter-btn:active {
-  transform: translateY(4px);
-  box-shadow: 0 1px 0 var(--accent-shadow);
+  transform: translateY(1px) scale(0.985);
+  box-shadow: 0 4px 12px var(--accent-glow);
 }
 
 .gate-exit-btn {
@@ -176,14 +191,16 @@
   color: var(--muted);
   padding: 10px 16px;
   border-radius: 12px;
+  font-family: var(--font-brand);
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: all var(--m-fast) var(--ease);
 }
 
 .gate-exit-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--panel-hover);
+  border-color: var(--line-strong);
   color: var(--text);
+  transform: translateY(-1px);
 }
-

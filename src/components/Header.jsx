@@ -2,7 +2,10 @@ export default function Header({ isMuted, onToggleSound }) {
   return (
     <header className="app-header">
       <div className="header-top-row">
-        <h1 className="app-title">Roll the Night</h1>
+        <div className="header-brand-block">
+          <span className="app-eyebrow">✦ Couple's Lottery &amp; Intimacy Game ✦</span>
+          <h1 className="app-title">Roll the Night</h1>
+        </div>
         <button
           type="button"
           className={`sound-toggle-btn ${isMuted ? 'muted' : ''}`}
@@ -10,7 +13,7 @@ export default function Header({ isMuted, onToggleSound }) {
           aria-label={isMuted ? 'Unmute sounds' : 'Mute sounds'}
           title={isMuted ? 'Sound off (click to unmute)' : 'Sound on (click to mute)'}
         >
-          {isMuted ? '🔇' : '🔊'}
+          <span className="sound-icon">{isMuted ? '🔇' : '🔊'}</span>
         </button>
       </div>
       <p className="app-subtitle">
