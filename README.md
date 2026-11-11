@@ -39,6 +39,11 @@ When a ball is drawn, the app picks a random position from the built-in database
 
 ## Changelog
 
+### 2026-11-11 – v1.9.1 – UI Decluttering & Position Count Removal
+- **Removed Position Count Specifier** (`src/components/SettingsPanel.jsx`, `src/App.css`):
+  - Removed the `"{poolCount} positions available"` badge from the Spiciness settings card to declutter the interface and reduce cognitive noise.
+- Touched files: `src/components/SettingsPanel.jsx`, `src/App.css`, `README.md`.
+
 ### 2026-11-10 – v1.9 – Design Taste & Refined Glassmorphic UI Overhaul
 - **Design Taste System Implementation** (`src/index.css`, `src/App.css`, `index.html`):
   - Applied `design-taste-frontend` rules: clean velvet midnight luxury palette (`#0c0817`), luminous glassmorphism (`backdrop-filter: blur(20px)` with `rgba(23, 16, 42, 0.74)`), and 1px inner specular highlights.

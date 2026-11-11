@@ -108,12 +108,9 @@ export default function SettingsPanel({
           })}
         </div>
 
-        {/* Active Spiciness Description & Count */}
+        {/* Active Spiciness Description */}
         <div className="spiciness-info-box">
           <p className="spiciness-desc">{currentSpiciness.description}</p>
-          <span className="spiciness-pool-count">
-            {poolCount} positions available
-          </span>
         </div>
       </div>
 

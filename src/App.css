@@ -398,18 +398,6 @@
   line-height: 1.4;
 }
 
-.spiciness-pool-count {
-  font-family: var(--font-brand);
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: var(--gold);
-  white-space: nowrap;
-  background: var(--gold-subtle);
-  border-radius: 8px;
-  padding: 3px 8px;
-  border: 1px solid rgba(251, 192, 45, 0.2);
-}
-
 /* ── 5. Category & Oral Filter Drawer ───────────────────── */
 .filter-section {
   border-top: 1px solid var(--line);
