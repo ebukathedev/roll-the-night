@@ -240,21 +240,24 @@
   justify-content: center;
   cursor: pointer;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transition: transform var(--m-fast) var(--ease),
-              background-color var(--m-fast) var(--ease),
-              border-color var(--m-fast) var(--ease),
-              opacity var(--m-fast) var(--ease);
+  transition: transform 120ms var(--ease-out),
+              background-color 140ms var(--ease-out),
+              border-color 140ms var(--ease-out),
+              opacity 140ms var(--ease-out);
   user-select: none;
 }
 
-.stepper-btn:hover:not(:disabled) {
-  background-color: var(--panel-hover);
-  border-color: var(--line-strong);
-  transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) {
+  .stepper-btn:hover:not(:disabled) {
+    background-color: var(--panel-hover);
+    border-color: var(--line-strong);
+    transform: translateY(-1px);
+  }
 }
 
 .stepper-btn:active:not(:disabled) {
-  transform: scale(0.92);
+  transform: scale(0.95);
+  background-color: var(--panel-hover);
 }
 
 .stepper-btn:disabled {
@@ -325,17 +328,28 @@
   gap: 4px;
   cursor: pointer;
   color: var(--text-secondary);
-  transition: all var(--m-fast) var(--ease);
+  transition: transform 120ms var(--ease-out),
+              background 140ms var(--ease-out),
+              border-color 140ms var(--ease-out),
+              color 140ms var(--ease-out),
+              box-shadow 140ms var(--ease-out);
   user-select: none;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-.spiciness-pill-btn:hover:not(:disabled),
-.vibe-pill-btn:hover:not(:disabled) {
-  border-color: var(--line-strong);
-  background: var(--panel-hover);
-  color: var(--text);
-  transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) {
+  .spiciness-pill-btn:hover:not(:disabled),
+  .vibe-pill-btn:hover:not(:disabled) {
+    border-color: var(--line-strong);
+    background: var(--panel-hover);
+    color: var(--text);
+    transform: translateY(-1px);
+  }
+}
+
+.spiciness-pill-btn:active:not(:disabled),
+.vibe-pill-btn:active:not(:disabled) {
+  transform: scale(0.96);
 }
 
 .spiciness-pill-btn.selected {
@@ -419,14 +433,23 @@
   font-weight: 600;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all var(--m-fast) var(--ease);
+  transition: background-color var(--m-fast) var(--ease-out),
+              border-color var(--m-fast) var(--ease-out),
+              color var(--m-fast) var(--ease-out),
+              transform var(--m-fast) var(--ease-out);
   user-select: none;
 }
 
-.filter-toggle-btn:hover:not(:disabled) {
-  background: var(--panel-hover);
-  border-color: var(--line-strong);
-  color: var(--text);
+@media (hover: hover) and (pointer: fine) {
+  .filter-toggle-btn:hover:not(:disabled) {
+    background: var(--panel-hover);
+    border-color: var(--line-strong);
+    color: var(--text);
+  }
+}
+
+.filter-toggle-btn:active:not(:disabled) {
+  transform: scale(0.985);
 }
 
 .filter-toggle-btn.open {
@@ -437,7 +460,7 @@
 
 .filter-toggle-icon {
   font-size: 0.8rem;
-  transition: transform var(--m-fast) var(--ease);
+  transition: transform var(--m-fast) var(--ease-out);
   color: var(--muted);
 }
 
@@ -493,8 +516,16 @@
   font-family: var(--font-brand);
   cursor: pointer;
   border: 1px solid var(--line);
-  transition: all var(--m-fast) var(--ease);
+  transition: background-color var(--m-fast) var(--ease-out),
+              border-color var(--m-fast) var(--ease-out),
+              color var(--m-fast) var(--ease-out),
+              transform var(--m-fast) var(--ease-out),
+              opacity var(--m-fast) var(--ease-out);
   user-select: none;
+}
+
+.category-toggle-chip:active:not(:disabled) {
+  transform: scale(0.95);
 }
 
 .category-checkbox-hidden {
@@ -511,12 +542,6 @@
   color: var(--text);
 }
 
-.category-toggle-chip.included:hover {
-  background: rgba(120, 60, 220, 0.28);
-  border-color: rgba(180, 140, 255, 0.6);
-  transform: translateY(-1px);
-}
-
 .category-toggle-chip.included .category-chip-check {
   color: var(--gold);
 }
@@ -528,13 +553,21 @@
   opacity: 0.65;
 }
 
-.category-toggle-chip.excluded:hover {
-  opacity: 0.9;
-  background: rgba(255, 255, 255, 0.06);
-}
-
 .category-toggle-chip.excluded .category-chip-check {
   color: #ff5277;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .category-toggle-chip.included:hover {
+    background: rgba(120, 60, 220, 0.28);
+    border-color: rgba(180, 140, 255, 0.6);
+    transform: translateY(-1px);
+  }
+
+  .category-toggle-chip.excluded:hover {
+    opacity: 0.9;
+    background: rgba(255, 255, 255, 0.06);
+  }
 }
 
 .category-chip-check {
@@ -581,14 +614,25 @@
   font-weight: 600;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all var(--m-fast) var(--ease);
+  transition: background-color var(--m-fast) var(--ease-out),
+              border-color var(--m-fast) var(--ease-out),
+              color var(--m-fast) var(--ease-out),
+              box-shadow var(--m-fast) var(--ease-out),
+              transform var(--m-fast) var(--ease-out);
   text-align: center;
+  user-select: none;
 }
 
-.oral-sub-btn:hover:not(:disabled) {
-  border-color: var(--line-strong);
-  background: var(--panel-hover);
-  color: var(--text);
+.oral-sub-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .oral-sub-btn:hover:not(:disabled) {
+    border-color: var(--line-strong);
+    background: var(--panel-hover);
+    color: var(--text);
+  }
 }
 
 .oral-sub-btn.selected {
@@ -616,23 +660,25 @@
     0 8px 24px var(--accent-glow),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transform: translateY(0);
-  transition: transform var(--m-fast) var(--ease),
-              box-shadow var(--m-fast) var(--ease),
-              filter var(--m-fast) var(--ease),
-              opacity var(--m-fast) var(--ease);
+  transition: transform 120ms var(--ease-out),
+              box-shadow 140ms var(--ease-out),
+              filter 140ms var(--ease-out),
+              opacity 140ms var(--ease-out);
   user-select: none;
 }
 
-.primary-action-btn:hover:not(:disabled) {
-  filter: brightness(1.08);
-  transform: translateY(-2px);
-  box-shadow:
-    0 12px 28px var(--accent-glow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+@media (hover: hover) and (pointer: fine) {
+  .primary-action-btn:hover:not(:disabled) {
+    filter: brightness(1.08);
+    transform: translateY(-2px);
+    box-shadow:
+      0 12px 28px var(--accent-glow),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
 }
 
 .primary-action-btn:active:not(:disabled) {
-  transform: translateY(1px) scale(0.985);
+  transform: translateY(1px) scale(0.97);
   box-shadow:
     0 4px 12px var(--accent-glow),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -678,7 +724,8 @@
   border-radius: 16px;
   padding: 6px;
   cursor: pointer;
-  transition: transform var(--m-fast) var(--ease);
+  transition: transform var(--m-fast) var(--ease-out);
+  user-select: none;
 }
 
 .tray-ball {
@@ -697,14 +744,20 @@
     radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.45) 14%, rgba(255, 255, 255, 0) 32%),
     radial-gradient(circle at 48% 48%, var(--ball-color) 0%, var(--ball-color-dark) 100%);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.42);
-  transition: transform var(--m-fast) var(--ease),
-              box-shadow var(--m-fast) var(--ease);
+  transition: transform var(--m-fast) var(--ease-out),
+              box-shadow var(--m-fast) var(--ease-out);
 }
 
-.tray-ball-link:hover .tray-ball,
-.tray-ball-link:focus-visible .tray-ball {
-  transform: translateY(-4px) scale(1.06);
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.55);
+.tray-ball-link:active .tray-ball {
+  transform: translateY(-1px) scale(0.96);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tray-ball-link:hover .tray-ball,
+  .tray-ball-link:focus-visible .tray-ball {
+    transform: translateY(-4px) scale(1.06);
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.55);
+  }
 }
 
 .tray-ball-caption {
@@ -719,15 +772,15 @@
 /* Drop Animation */
 @keyframes trayDrop {
   0% {
-    transform: translateY(-60px) scale(0.4);
+    transform: translateY(-36px) scale(0.92);
     opacity: 0;
   }
   65% {
-    transform: translateY(6px) scale(1.04);
+    transform: translateY(4px) scale(1.02);
     opacity: 1;
   }
   85% {
-    transform: translateY(-2px) scale(0.98);
+    transform: translateY(-1px) scale(0.99);
   }
   100% {
     transform: translateY(0) scale(1);

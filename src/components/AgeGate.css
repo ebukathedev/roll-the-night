@@ -46,12 +46,12 @@
   flex-direction: column;
   align-items: center;
   gap: 14px;
-  animation: cardPopUp 0.45s var(--ease-spring) forwards;
+  animation: cardPopUp 240ms var(--ease-out) forwards;
 }
 
 @keyframes cardPopUp {
   0% {
-    transform: translateY(24px) scale(0.94);
+    transform: translateY(16px) scale(0.96);
     opacity: 0;
   }
   100% {
@@ -166,22 +166,24 @@
     0 8px 24px var(--accent-glow),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
   transform: translateY(0);
-  transition: transform var(--m-fast) var(--ease),
-              box-shadow var(--m-fast) var(--ease),
-              filter var(--m-fast) var(--ease);
+  transition: transform 120ms var(--ease-out),
+              box-shadow 140ms var(--ease-out),
+              filter 140ms var(--ease-out);
   user-select: none;
 }
 
-.gate-enter-btn:hover {
-  filter: brightness(1.08);
-  transform: translateY(-2px);
-  box-shadow:
-    0 12px 28px var(--accent-glow),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+@media (hover: hover) and (pointer: fine) {
+  .gate-enter-btn:hover {
+    filter: brightness(1.08);
+    transform: translateY(-2px);
+    box-shadow:
+      0 12px 28px var(--accent-glow),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
 }
 
 .gate-enter-btn:active {
-  transform: translateY(1px) scale(0.985);
+  transform: translateY(1px) scale(0.97);
   box-shadow: 0 4px 12px var(--accent-glow);
 }
 
@@ -195,12 +197,22 @@
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--m-fast) var(--ease);
+  transition: background-color var(--m-fast) var(--ease-out),
+              border-color var(--m-fast) var(--ease-out),
+              color var(--m-fast) var(--ease-out),
+              transform var(--m-fast) var(--ease-out);
+  user-select: none;
 }
 
-.gate-exit-btn:hover {
-  background: var(--panel-hover);
-  border-color: var(--line-strong);
-  color: var(--text);
-  transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) {
+  .gate-exit-btn:hover {
+    background: var(--panel-hover);
+    border-color: var(--line-strong);
+    color: var(--text);
+    transform: translateY(-1px);
+  }
+}
+
+.gate-exit-btn:active {
+  transform: scale(0.97);
 }
